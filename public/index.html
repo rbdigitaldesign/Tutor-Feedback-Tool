@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tutor Feedback — Session Report</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Tutorial Session Feedback</h1>
+      <p class="subtitle">Help us improve — takes less than 2 minutes. <a href="dashboard.html">View all feedback &rarr;</a></p>
+    </header>
+
+    <form id="feedbackForm" novalidate>
+
+      <!-- Session info -->
+      <section class="card">
+        <h2>Session Details</h2>
+        <div class="field-row">
+          <div class="field">
+            <label for="tutorName">Your name <span class="optional">(optional)</span></label>
+            <input type="text" id="tutorName" name="tutorName" placeholder="e.g. Dr Smith">
+          </div>
+          <div class="field">
+            <label for="sessionDate">Session date <span class="required">*</span></label>
+            <input type="date" id="sessionDate" name="sessionDate" required>
+          </div>
+        </div>
+        <div class="field">
+          <label for="tutorialName">Tutorial / activity name <span class="required">*</span></label>
+          <input type="text" id="tutorialName" name="tutorialName" placeholder="e.g. Week 4 — AI Ethics Case Study" required>
+        </div>
+      </section>
+
+      <!-- What went well -->
+      <section class="card success-card">
+        <h2>&#10003; What worked well?</h2>
+        <p class="hint">Tick everything that applied this session.</p>
+        <div class="checkbox-grid">
+          <label class="checkbox-label">
+            <input type="checkbox" name="successes" value="High engagement">
+            <span>High engagement</span>
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" name="successes" value="Effective learning">
+            <span>Effective learning</span>
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" name="successes" value="Smooth running">
+            <span>Smooth running</span>
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" name="successes" value="Good discussion">
+            <span>Good discussion</span>
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" name="successes" value="Clear instructions">
+            <span>Clear instructions</span>
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" name="successes" value="Other">
+            <span>Other (describe below)</span>
+          </label>
+        </div>
+      </section>
+
+      <!-- What didn't go well -->
+      <section class="card failure-card">
+        <h2>&#10007; What didn't work?</h2>
+        <p class="hint">Tick everything that applied this session.</p>
+        <div class="checkbox-grid">
+          <label class="checkbox-label">
+            <input type="checkbox" name="failures" value="Low engagement">
+            <span>Low engagement</span>
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" name="failures" value="Misinformed or superficial learning">
+            <span>Misinformed / superficial learning</span>
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" name="failures" value="Barriers to learning">
+            <span>Barriers to learning</span>
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" name="failures" value="Bad or unclear instructions">
+            <span>Bad / unclear instructions</span>
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" name="failures" value="Negative conflict">
+            <span>Negative conflict</span>
+          </label>
+          <label class="checkbox-label">
+            <input type="checkbox" name="failures" value="Other">
+            <span>Other (describe below)</span>
+          </label>
+        </div>
+      </section>
+
+      <!-- Open text -->
+      <section class="card">
+        <h2>Notes &amp; Suggestions</h2>
+        <div class="field">
+          <label for="suggestions">Improvement suggestions</label>
+          <textarea id="suggestions" name="suggestions" rows="3" placeholder="What would make this tutorial better?"></textarea>
+        </div>
+        <div class="field">
+          <label for="notes">Any other observations</label>
+          <textarea id="notes" name="notes" rows="3" placeholder="Anything else worth capturing…"></textarea>
+        </div>
+      </section>
+
+      <div class="actions">
+        <button type="submit" class="btn-primary">Submit Feedback</button>
+      </div>
+
+      <div id="statusMsg" class="status-msg hidden"></div>
+    </form>
+  </div>
+
+  <script>
+    // Pre-fill today's date
+    document.getElementById('sessionDate').valueAsDate = new Date();
+
+    document.getElementById('feedbackForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const form = e.target;
+      const msg = document.getElementById('statusMsg');
+
+      const successes = [...form.querySelectorAll('[name="successes"]:checked')].map(el => el.value);
+      const failures  = [...form.querySelectorAll('[name="failures"]:checked')].map(el => el.value);
+
+      const payload = {
+        tutorName:    form.tutorName.value.trim(),
+        tutorialName: form.tutorialName.value.trim(),
+        sessionDate:  form.sessionDate.value,
+        successes,
+        failures,
+        suggestions:  form.suggestions.value.trim(),
+        notes:        form.notes.value.trim()
+      };
+
+      if (!payload.tutorialName || !payload.sessionDate) {
+        showMsg('Please fill in tutorial name and session date.', 'error');
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/feedback', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (!res.ok) throw new Error('Server error');
+        showMsg('Feedback submitted — thank you!', 'success');
+        form.reset();
+        document.getElementById('sessionDate').valueAsDate = new Date();
+      } catch {
+        showMsg('Something went wrong. Please try again.', 'error');
+      }
+    });
+
+    function showMsg(text, type) {
+      const el = document.getElementById('statusMsg');
+      el.textContent = text;
+      el.className = 'status-msg ' + type;
+    }
+  </script>
+</body>
+</html>

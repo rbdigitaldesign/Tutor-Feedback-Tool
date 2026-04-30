@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tutor Feedback — Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Feedback Dashboard</h1>
+      <p class="subtitle">All submitted tutor feedback in one place. <a href="index.html">&larr; Submit feedback</a></p>
+    </header>
+
+    <div class="dashboard-toolbar">
+      <div class="filter-group">
+        <label for="filterTutorial">Filter by tutorial</label>
+        <select id="filterTutorial">
+          <option value="">All tutorials</option>
+        </select>
+      </div>
+      <a href="/api/feedback/export" class="btn-secondary">Export CSV</a>
+    </div>
+
+    <!-- Summary cards -->
+    <div id="summaryCards" class="summary-grid"></div>
+
+    <!-- Entries table -->
+    <section class="card">
+      <h2>All Submissions <span id="entryCount" class="count-badge">0</span></h2>
+      <div class="table-wrapper">
+        <table id="feedbackTable">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Tutorial</th>
+              <th>Tutor</th>
+              <th>What worked</th>
+              <th>What didn't</th>
+              <th>Suggestions</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <tr><td colspan="6" class="empty-msg">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    let allData = [];
+
+    async function load() {
+      try {
+        const res = await fetch('/api/feedback');
+        allData = await res.json();
+        populateFilter(allData);
+        render(allData);
+      } catch {
+        document.getElementById('tableBody').innerHTML =
+          '<tr><td colspan="6" class="empty-msg error">Failed to load feedback.</td></tr>';
+      }
+    }
+
+    function populateFilter(data) {
+      const tutorials = [...new Set(data.map(e => e.tutorialName))].sort();
+      const sel = document.getElementById('filterTutorial');
+      tutorials.forEach(t => {
+        const opt = document.createElement('option');
+        opt.value = t;
+        opt.textContent = t;
+        sel.appendChild(opt);
+      });
+    }
+
+    function render(data) {
+      document.getElementById('entryCount').textContent = data.length;
+      renderSummary(data);
+      renderTable(data);
+    }
+
+    function renderSummary(data) {
+      const successCounts = {};
+      const failureCounts = {};
+
+      data.forEach(e => {
+        (e.successes || []).forEach(s => { successCounts[s] = (successCounts[s] || 0) + 1; });
+        (e.failures  || []).forEach(f => { failureCounts[f] = (failureCounts[f] || 0) + 1; });
+      });
+
+      const topSuccess = Object.entries(successCounts).sort((a,b) => b[1]-a[1]).slice(0,3);
+      const topFailure = Object.entries(failureCounts).sort((a,b) => b[1]-a[1]).slice(0,3);
+
+      const grid = document.getElementById('summaryCards');
+      grid.innerHTML = `
+        <div class="summary-card success-card">
+          <h3>Top successes</h3>
+          ${topSuccess.length
+            ? topSuccess.map(([k,v]) => `<div class="bar-item"><span>${k}</span><span class="badge">${v}</span></div>`).join('')
+            : '<p class="empty-msg">No data yet</p>'}
+        </div>
+        <div class="summary-card failure-card">
+          <h3>Top issues</h3>
+          ${topFailure.length
+            ? topFailure.map(([k,v]) => `<div class="bar-item"><span>${k}</span><span class="badge">${v}</span></div>`).join('')
+            : '<p class="empty-msg">No data yet</p>'}
+        </div>
+        <div class="summary-card">
+          <h3>Total submissions</h3>
+          <p class="big-number">${data.length}</p>
+          <p class="hint">${[...new Set(data.map(e=>e.tutorialName))].length} unique tutorial(s)</p>
+        </div>
+      `;
+    }
+
+    function renderTable(data) {
+      const tbody = document.getElementById('tableBody');
+      if (!data.length) {
+        tbody.innerHTML = '<tr><td colspan="6" class="empty-msg">No feedback submitted yet.</td></tr>';
+        return;
+      }
+      const sorted = [...data].sort((a,b) => new Date(b.submittedAt) - new Date(a.submittedAt));
+      tbody.innerHTML = sorted.map(e => `
+        <tr>
+          <td>${e.sessionDate}</td>
+          <td>${esc(e.tutorialName)}</td>
+          <td>${esc(e.tutorName)}</td>
+          <td>${tags(e.successes, 'tag-success')}</td>
+          <td>${tags(e.failures,  'tag-failure')}</td>
+          <td class="text-cell">${esc(e.suggestions)}${e.notes ? `<br><em>${esc(e.notes)}</em>` : ''}</td>
+        </tr>
+      `).join('');
+    }
+
+    function tags(arr, cls) {
+      if (!arr || !arr.length) return '<span class="tag-none">—</span>';
+      return arr.map(t => `<span class="tag ${cls}">${esc(t)}</span>`).join(' ');
+    }
+
+    function esc(str) {
+      if (!str) return '';
+      return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    document.getElementById('filterTutorial').addEventListener('change', e => {
+      const val = e.target.value;
+      render(val ? allData.filter(d => d.tutorialName === val) : allData);
+    });
+
+    load();
+  </script>
+</body>
+</html>
