@@ -1,0 +1,323 @@
+/* ── Reset & base ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  background: #f4f6f9;
+  color: #1a1a2e;
+  min-height: 100vh;
+}
+
+a { color: #4361ee; }
+a:hover { text-decoration: none; }
+
+/* ── Layout ── */
+.container {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 4rem;
+}
+
+header {
+  margin-bottom: 1.75rem;
+}
+
+header h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1a1a2e;
+}
+
+.subtitle {
+  color: #555;
+  margin-top: .25rem;
+}
+
+/* ── Cards ── */
+.card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,.08);
+}
+
+.card h2 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: .9rem;
+  color: #1a1a2e;
+}
+
+.success-card { border-left: 4px solid #2ec4b6; }
+.failure-card  { border-left: 4px solid #e76f51; }
+
+/* ── Form fields ── */
+.field {
+  margin-bottom: 1rem;
+}
+
+.field:last-child { margin-bottom: 0; }
+
+.field label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: .35rem;
+  font-size: .875rem;
+}
+
+.field input[type="text"],
+.field input[type="date"],
+.field textarea,
+.field select {
+  width: 100%;
+  padding: .55rem .75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: .9375rem;
+  font-family: inherit;
+  transition: border-color .15s;
+  background: #fff;
+}
+
+.field input:focus,
+.field textarea:focus,
+.field select:focus {
+  outline: none;
+  border-color: #4361ee;
+  box-shadow: 0 0 0 3px rgba(67,97,238,.15);
+}
+
+.field textarea { resize: vertical; }
+
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 500px) { .field-row { grid-template-columns: 1fr; } }
+
+.required { color: #e76f51; }
+.optional  { color: #999; font-weight: 400; }
+
+.hint {
+  font-size: .8125rem;
+  color: #777;
+  margin-bottom: .75rem;
+}
+
+/* ── Checkboxes ── */
+.checkbox-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: .5rem;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .5rem .75rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: .875rem;
+  transition: background .1s, border-color .1s;
+}
+
+.checkbox-label:hover { background: #f9fafb; }
+
+.checkbox-label input[type="checkbox"] {
+  accent-color: #4361ee;
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+}
+
+.success-card .checkbox-label input { accent-color: #2ec4b6; }
+.failure-card  .checkbox-label input { accent-color: #e76f51; }
+
+/* ── Buttons ── */
+.actions { display: flex; gap: .75rem; justify-content: flex-end; margin-top: .5rem; }
+
+.btn-primary {
+  background: #4361ee;
+  color: #fff;
+  border: none;
+  padding: .65rem 1.5rem;
+  border-radius: 6px;
+  font-size: .9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .15s;
+}
+.btn-primary:hover { background: #3451d1; }
+
+.btn-secondary {
+  display: inline-block;
+  background: #fff;
+  color: #4361ee;
+  border: 1px solid #4361ee;
+  padding: .55rem 1.25rem;
+  border-radius: 6px;
+  font-size: .875rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background .15s;
+}
+.btn-secondary:hover { background: #f0f3ff; }
+
+/* ── Status message ── */
+.status-msg {
+  margin-top: 1rem;
+  padding: .75rem 1rem;
+  border-radius: 6px;
+  font-size: .875rem;
+  text-align: center;
+}
+.status-msg.hidden { display: none; }
+.status-msg.success { background: #d1fae5; color: #065f46; }
+.status-msg.error   { background: #fee2e2; color: #991b1b; }
+
+/* ── Dashboard toolbar ── */
+.dashboard-toolbar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.filter-group label {
+  display: block;
+  font-size: .8125rem;
+  font-weight: 500;
+  margin-bottom: .3rem;
+}
+
+.filter-group select {
+  padding: .5rem .75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: .9375rem;
+  font-family: inherit;
+  background: #fff;
+  cursor: pointer;
+}
+
+/* ── Summary cards ── */
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.summary-card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 1.25rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,.08);
+}
+
+.summary-card.success-card { border-left: 4px solid #2ec4b6; }
+.summary-card.failure-card  { border-left: 4px solid #e76f51; }
+
+.summary-card h3 {
+  font-size: .875rem;
+  font-weight: 600;
+  margin-bottom: .75rem;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: #555;
+}
+
+.bar-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: .3rem 0;
+  font-size: .875rem;
+  border-bottom: 1px solid #f3f4f6;
+}
+.bar-item:last-child { border-bottom: none; }
+
+.badge {
+  background: #e5e7eb;
+  color: #374151;
+  border-radius: 999px;
+  padding: .1rem .55rem;
+  font-size: .75rem;
+  font-weight: 700;
+  min-width: 1.5rem;
+  text-align: center;
+}
+
+.big-number {
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1;
+  color: #4361ee;
+  margin-bottom: .25rem;
+}
+
+/* ── Table ── */
+.table-wrapper { overflow-x: auto; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .875rem;
+}
+
+thead th {
+  text-align: left;
+  padding: .6rem .75rem;
+  background: #f9fafb;
+  border-bottom: 2px solid #e5e7eb;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+tbody td {
+  padding: .65rem .75rem;
+  border-bottom: 1px solid #f3f4f6;
+  vertical-align: top;
+}
+
+tbody tr:hover td { background: #fafbff; }
+
+.text-cell { max-width: 220px; color: #444; }
+
+.empty-msg { color: #999; font-style: italic; padding: 1rem .75rem; }
+.empty-msg.error { color: #c0392b; }
+
+.count-badge {
+  background: #4361ee;
+  color: #fff;
+  border-radius: 999px;
+  padding: .1rem .6rem;
+  font-size: .75rem;
+  font-weight: 700;
+  vertical-align: middle;
+  margin-left: .4rem;
+}
+
+/* ── Tags ── */
+.tag {
+  display: inline-block;
+  padding: .15rem .55rem;
+  border-radius: 999px;
+  font-size: .75rem;
+  font-weight: 500;
+  margin: .1rem .1rem .1rem 0;
+  white-space: nowrap;
+}
+
+.tag-success { background: #ccfbf1; color: #0f766e; }
+.tag-failure  { background: #fee2e2; color: #b91c1c; }
+.tag-none     { color: #bbb; }
